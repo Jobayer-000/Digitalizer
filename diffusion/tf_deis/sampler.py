@@ -147,7 +147,7 @@ def get_sampler_rho_rk(sde, eps_fn, ts_phase, ts_order, num_step, rk_method):
 
     def sample_fn(xT):
         vT = sde.x2v(xT, rev_ts[0])
-        veps = jax.lax.fori_loop(0, len(rev_rhos)-1, _step_fn, vT)
+        
         for i in range(0, len(rev_rhos)-1):
             vT = _step_fn(vT)
             return vT
