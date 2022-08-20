@@ -1,5 +1,4 @@
 import tensorflow as tf
-import rk
 from multistep import ab_step, get_ab_eps_coef
 from rk import get_rk_fn
 from sde import MultiStepSDE, get_rev_ts
