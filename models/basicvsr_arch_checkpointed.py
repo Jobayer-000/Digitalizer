@@ -248,13 +248,13 @@ class BasicVSR(models.Model):
         spynet_path (str): Path to the pretrained weights of SPyNet. Default: None.
     """
 
-    def __init__(self, num_feat=64, num_block=15, num_bblock = 6, output_ch=3, spynet_path=None, scale=False,shapes=(30,224,224,3)):
+    def __init__(self, num_feat=64, num_block=15, num_bblock = 6, output_ch=3, spynet_path=None, scale=False, shapes=(25,224,224,3)):
         super().__init__()
         self.shapes = shapes
         self.num_feat = num_feat
         self.scale = scale
         # alignment
-        self.spynet = SpyNet(spynet_path, num_bblock)
+        self.spynet = SpyNet(num_bblock, spynet_path)
 
         # propagation
         self.backward_trunk = ConvResidualBlocks(num_feat + 3, num_feat, num_block)
