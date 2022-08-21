@@ -291,7 +291,7 @@ class BasicVSR(models.Model):
         Args:
             x: Input frames with shape (b, n, h, w, c). n is the temporal dimension / number of frames.
         """
-        x = tf.concat([x, up_lr], axis=-1)
+       
         flows_forward, flows_backward = self.get_flow(x)
         shape = tf.shape(x)
         b, n, h, w, c = shape[0], shape[1], shape[2], shape[3], shape[4]
