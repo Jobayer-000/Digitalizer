@@ -127,14 +127,15 @@ class GaussianDiffusion2:
             x_start.shape[0])
     return posterior_mean, posterior_variance, posterior_log_variance_clipped
 
-  def p_mean_variance(self, denoise_fn, *, x, t, clip_denoised: bool, return_pred_xstart: bool):
-    B, H, W, C = x.shape
-    assert t.shape == [B]
-    model_output = denoise_fn(x, t)
+  def p_mean_variance(self, denoise_fn, *, x, up_lr, t, clip_denoised: bool, return_pred_xstart: bool):
+   
+    shape = x.shape
+    assert t.shape == [shape[0]
+    model_output = denoise_fn(tf.concat([x,up_lr],axis=-1))
 
     # Learned or fixed variance?
     if self.model_var_type == 'learned':
-      assert model_output.shape == [B, H, W, C * 2]
+      assert model_output.shape == [*shape[:-1],shape[-1]*2]
       model_output, model_log_variance = tf.split(model_output, 2, axis=-1)
       model_variance = tf.exp(model_log_variance)
     elif self.model_var_type in ['fixedsmall', 'fixedlarge']:
@@ -190,7 +191,7 @@ class GaussianDiffusion2:
     Sample from the model
     """
     model_mean, _, model_log_variance, pred_xstart = self.p_mean_variance(
-      denoise_fn, x=x, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
+      denoise_fn, x=x, up_lr, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
     noise = noise_fn(shape=x.shape, dtype=x.dtype)
     assert noise.shape == x.shape
     # no noise when t == 0
@@ -256,10 +257,10 @@ class GaussianDiffusion2:
 
   # === Log likelihood calculation ===
 
-  def _vb_terms_bpd(self, denoise_fn, x_start, x_t, t, *, clip_denoised: bool, return_pred_xstart: bool):
+  def _vb_terms_bpd(self, denoise_fn, x_start, x_t, up_lr, t, *, clip_denoised: bool, return_pred_xstart: bool):
     true_mean, _, true_log_variance_clipped = self.q_posterior_mean_variance(x_start=x_start, x_t=x_t, t=t)
     model_mean, _, model_log_variance, pred_xstart = self.p_mean_variance(
-      denoise_fn, x=x_t, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
+      denoise_fn, x=x_t, up_lr, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
     kl = normal_kl(true_mean, true_log_variance_clipped, model_mean, model_log_variance)
     kl = nn.meanflat(kl) / np.log(2.)
 
@@ -273,11 +274,11 @@ class GaussianDiffusion2:
     output = tf.where(tf.equal(t, 0), decoder_nll, kl)
     return (output, pred_xstart) if return_pred_xstart else output
 
-  def training_losses(self, denoise_fn, x_start, t, noise=None):
+  def training_losses(self, denoise_fn, x_start, lr_inp, t, noise=None):
     """
     Training loss calculation
     """
-
+    up_lr = tf.image.resize(lr_inp, x_start.shape[2:-1], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
     # Add noise to data
     assert t.shape == [x_start.shape[0]]
     if noise is None:
@@ -288,7 +289,7 @@ class GaussianDiffusion2:
     # Calculate the loss
     if self.loss_type == 'kl':  # the variational bound
       losses = self._vb_terms_bpd(
-        denoise_fn=denoise_fn, x_start=x_start, x_t=x_t, t=t, clip_denoised=False, return_pred_xstart=False)
+        denoise_fn=denoise_fn, x_start=x_start, x_t=x_t, up_lr, t=t, clip_denoised=False, return_pred_xstart=False)
     elif self.loss_type == 'mse':  # unweighted MSE
       assert self.model_var_type != 'learned'
       target = {
@@ -296,7 +297,7 @@ class GaussianDiffusion2:
         'xstart': x_start,
         'eps': noise
       }[self.model_mean_type]
-      model_output = denoise_fn(x_t, t)
+      model_output = denoise_fn(tf.concat([x_t, up_lr],axis=-1))
       assert model_output.shape == target.shape == x_start.shape
       losses = nn.meanflat(tf.square(tf.subtract(target, model_output)))
     else:
