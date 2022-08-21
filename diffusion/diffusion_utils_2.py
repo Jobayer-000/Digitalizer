@@ -282,7 +282,7 @@ class GaussianDiffusion2:
     # Add noise to data
     assert t.shape == [x_start.shape[0]]
     if noise is None:
-      noise = tf.random_normal(shape=x_start.shape, dtype=x_start.dtype)
+      noise = tf.random.normal(shape=x_start.shape, dtype=x_start.dtype)
     assert noise.shape == x_start.shape and noise.dtype == x_start.dtype
     x_t = self.q_sample(x_start=x_start, t=t, noise=noise)
 
