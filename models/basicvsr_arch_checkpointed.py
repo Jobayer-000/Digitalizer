@@ -298,7 +298,7 @@ class BasicVSR(models.Model):
         # backward branch
         out_l = []
         feat_prop = tf.zeros((b, h, w, self.num_feat), flows_forward.dtype)
-        for i in range(self.shapes[0] - 1, -1, -1):
+        for i in range(n - 1, -1, -1):
             x_i = tf.cast(x[:, i, :, :, :], flows_forward.dtype)
             if i < self.shapes[0] - 1:
                 flow = flows_backward[:, i, :, :, :]
