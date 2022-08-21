@@ -340,10 +340,10 @@ class BasicVSR(models.Model):
               out_j1.append(tf.add(out1,base1))
               out_j2.append(tf.add(out2,base2))
             else:
-                x = self.lrelu(self.fusion(out))
-                x = self.conv_last(x)
+                out = self.lrelu(self.fusion(out))
+                out = self.conv_last(out)
                 
-            out_j.append(tf.add(x, x_i[...,:3]))
+            out_j.append(tf.add(out, x_i[...,:3]))
         return tf.stack(out_j, 1) if not self.scale else tf.stack(out_j, 1), tf.stack(out_j1,1), tf.stack(out_j2,1)
    
     def build_model_with_grap(self, input_shape):
