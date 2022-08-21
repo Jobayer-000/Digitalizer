@@ -191,7 +191,7 @@ class GaussianDiffusion2:
     Sample from the model
     """
     model_mean, _, model_log_variance, pred_xstart = self.p_mean_variance(
-      denoise_fn, x=x, up_lr, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
+      denoise_fn, x=x, up_lr=up_lr, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
     noise = noise_fn(shape=x.shape, dtype=x.dtype)
     assert noise.shape == x.shape
     # no noise when t == 0
@@ -260,7 +260,7 @@ class GaussianDiffusion2:
   def _vb_terms_bpd(self, denoise_fn, x_start, x_t, up_lr, t, *, clip_denoised: bool, return_pred_xstart: bool):
     true_mean, _, true_log_variance_clipped = self.q_posterior_mean_variance(x_start=x_start, x_t=x_t, t=t)
     model_mean, _, model_log_variance, pred_xstart = self.p_mean_variance(
-      denoise_fn, x=x_t, up_lr, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
+      denoise_fn, x=x_t, up_lr=up_lr, t=t, clip_denoised=clip_denoised, return_pred_xstart=True)
     kl = normal_kl(true_mean, true_log_variance_clipped, model_mean, model_log_variance)
     kl = nn.meanflat(kl) / np.log(2.)
 
@@ -289,7 +289,7 @@ class GaussianDiffusion2:
     # Calculate the loss
     if self.loss_type == 'kl':  # the variational bound
       losses = self._vb_terms_bpd(
-        denoise_fn=denoise_fn, x_start=x_start, x_t=x_t, up_lr, t=t, clip_denoised=False, return_pred_xstart=False)
+        denoise_fn=denoise_fn, x_start=x_start, x_t=x_t, up_lr=up_lr, t=t, clip_denoised=False, return_pred_xstart=False)
     elif self.loss_type == 'mse':  # unweighted MSE
       assert self.model_var_type != 'learned'
       target = {
