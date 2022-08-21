@@ -310,7 +310,7 @@ class BasicVSR(models.Model):
         # forward branch
         out_j, out_j1, out_j2 = [],[],[]
         feat_prop = tf.zeros_like((feat_prop), flows_forward.dtype)
-        for i in range(0, self.shapes[0]):
+        for i in range(0, n):
             x_i = tf.cast(x[:, i, :, :, :], flows_forward.dtype)
             if i > 0:
                 flow = flows_forward[:, i - 1, :, :, :]
