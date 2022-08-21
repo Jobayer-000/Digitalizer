@@ -130,7 +130,7 @@ class GaussianDiffusion2:
   def p_mean_variance(self, denoise_fn, *, x, up_lr, t, clip_denoised: bool, return_pred_xstart: bool):
    
     shape = x.shape
-    assert t.shape == [shape[0]
+    assert t.shape == [shape[0]]
     model_output = denoise_fn(tf.concat([x,up_lr],axis=-1))
 
     # Learned or fixed variance?
