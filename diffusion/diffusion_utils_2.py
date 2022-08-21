@@ -82,7 +82,7 @@ class GaussianDiffusion2:
     self.posterior_mean_coef1 = betas * np.sqrt(self.alphas_cumprod_prev) / (1. - self.alphas_cumprod)
     self.posterior_mean_coef2 = (1. - self.alphas_cumprod_prev) * np.sqrt(alphas) / (1. - self.alphas_cumprod)
 
-  
+  @staticmethod
   def _extract(a, t, x_shape):
     """
     Extract some coefficients at specified timesteps,
