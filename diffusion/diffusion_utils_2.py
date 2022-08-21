@@ -278,7 +278,7 @@ class GaussianDiffusion2:
     """
     Training loss calculation
     """
-    up_lr = tf.image.resize(lr_inp, x_start.shape[2:-1], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+    up_lr = tf.expand_dims(tf.image.resize(lr_inp[0], x_start.shape[2:-1], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
     # Add noise to data
     assert t.shape == [x_start.shape[0]]
     if noise is None:
