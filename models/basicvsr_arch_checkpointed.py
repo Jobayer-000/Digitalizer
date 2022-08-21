@@ -298,7 +298,7 @@ class BasicVSR(models.Model):
         # backward branch
         out_l = []
         feat_prop = tf.zeros((b, h, w, self.num_feat), flows_forward.dtype)
-        for i in range(x.shape[1] - 1, -1, -1):
+        for i in range(n - 1, -1, -1):
             x_i = tf.cast(x[:, i, :, :, :], flows_forward.dtype)
             if i < self.shapes[0] - 1:
                 flow = flows_backward[:, i, :, :, :]
@@ -310,7 +310,7 @@ class BasicVSR(models.Model):
         # forward branch
         out_j, out_j1, out_j2 = [],[],[]
         feat_prop = tf.zeros_like((feat_prop), flows_forward.dtype)
-        for i in range(0, x.shape[1]):
+        for i in range(0, n):
             x_i = tf.cast(x[:, i, :, :, :], flows_forward.dtype)
             if i > 0:
                 flow = flows_forward[:, i - 1, :, :, :]
@@ -328,7 +328,7 @@ class BasicVSR(models.Model):
                 x3 = self.lrelu(self.pixel_shuffle(self.upconv2(x2)))
                 x4 = self.lrelu(self.conv_hr(x3))
                 x5 = self.conv_last(x4)
-                return x5, x2,x1
+                return x5, x2, x1
             
             if self.scale:
               out,out1,out2 = inner(out)
@@ -344,6 +344,8 @@ class BasicVSR(models.Model):
                 out = self.conv_last(out)
                 
             out_j.append(tf.add(out, x_i[...,:3]))
+            print(0)
+        print(out_j)
         return tf.stack(out_j, 1) if not self.scale else tf.stack(out_j, 1), tf.stack(out_j1,1), tf.stack(out_j2,1)
    
     def build_model_with_grap(self, input_shape):
