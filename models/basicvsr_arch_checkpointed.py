@@ -344,9 +344,8 @@ class BasicVSR(models.Model):
                 out = self.conv_last(out)
                 
             out_j.append(tf.add(out, x_i[...,:3]))
-            print(0)
-        print(out_j)
-        return tf.stack(out_j, 1) if not self.scale else tf.stack(out_j, 1), tf.stack(out_j1,1), tf.stack(out_j2,1)
+        
+        return tf.stack(out_j, 1) if not self.scale else (tf.stack(out_j, 1), tf.stack(out_j1,1), tf.stack(out_j2,1))
    
     def build_model_with_grap(self, input_shape):
         inputs = keras.Input(shape=input_shape)
