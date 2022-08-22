@@ -31,7 +31,7 @@ class ResidualBlockNoBN(layers.Layer):
         self.relu = layers.ReLU()
 
     def call(self, inputs):
-        
+        @gradient_checkpointing.recompute_grad
         def inner(inputs):
             out = self.conv2(self.relu(self.conv1(inputs)))
             return inputs + out * self.res_scale
@@ -178,7 +178,7 @@ class BasicModule(layers.Layer):
         self.x4 = layers.Conv2D(16, 7, 1, padding='same', activation='relu')
         self.x5 = layers.Conv2D(2, 7, 1, padding='same')
     def call(self,x):
-     
+      @gradient_checkpointing.recompute_grad
       def inner(x):
         x = self.x1(x)
         x = self.x2(x)
@@ -232,7 +232,7 @@ class SpyNet(layers.Layer):
 
     def call(self, ref, supp):
         # h, w must be multiple of 32
-        @gradient_checkpointing.recompute_grad
+        
         def inner(ref, supp):
             flow = self.process(ref, supp)
             return flow                    
@@ -368,7 +368,7 @@ class ConvResidualBlocks(layers.Layer):
             make_layer(ResidualBlockNoBN, num_block, num_feat=num_out_ch)])
 
     def call(self, fea):
-        @gradient_checkpointing.recompute_grad
+        
         def inner(fea):
             return self.main(fea)
         return inner(fea)
