@@ -206,7 +206,7 @@ class SpyNet(layers.Layer):
         ref = [ref]
         supp = [supp]
 
-        for level in range(5):
+        for level in range(4):
             ref.insert(0, tf.nn.avg_pool2d(ref[0], ksize=2, strides=2, padding='VALID'))
             supp.insert(0, tf.nn.avg_pool2d(supp[0], ksize=2, strides=2, padding='VALID'))
 
