@@ -366,10 +366,14 @@ class ConvResidualBlocks(layers.Layer):
             layers.Conv2D(num_out_ch, 3, 1, padding='same', use_bias=True),
             layers.LeakyReLU(.1),
             make_layer(ResidualBlockNoBN, num_block, num_feat=num_out_ch)])
-
+        self.cv = layers.Conv2D(num_out_ch, 3, 1, padding='same', use_bias=True, activation=layers.LeakyReLU(.1))
+        self.rblock = [ResidualBlockNoBN(num_feat=num_out_ch) for _ in range(num_block)]
     def call(self, fea):
         
         def inner(fea):
+            x = self.cv(fea)
+            for block in self.rblock:
+                x = block(x)
             return self.main(fea)
         return inner(fea)
        
