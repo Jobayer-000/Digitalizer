@@ -157,7 +157,9 @@ def flow_warp(x, flow, interp_mode='bilinear', padding_mode='zeros', align_corne
     h, w = shape[1], shape[2]
     # create mesh grid
     grid_x, grid_y = tf.meshgrid(tf.range(w), tf.range(h))
+    print(0)
     grid = tf.cast(tf.stack([grid_y, grid_x], axis=2), x.dtype)
+    print(grid, flow)
     vgrid = tf.add(grid, flow)
                             
     # scale grid to [-1,1]
