@@ -186,7 +186,7 @@ class GaussianDiffusion2:
 
   # === Sampling ===
 
-  def p_sample(self, denoise_fn, *, x, t, noise_fn, clip_denoised=True, return_pred_xstart: bool):
+  def p_sample(self, denoise_fn, up_lr, *, x, t, noise_fn, clip_denoised=True, return_pred_xstart: bool):
     """
     Sample from the model
     """
@@ -204,19 +204,19 @@ class GaussianDiffusion2:
     """
     Generate samples
     """
-    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], (lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
+    up_lr = tf.expand_dims(tf.image.resize(lr_inp[0], (lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
                                   method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
     
     assert isinstance(shape, (tuple, list))
     i_0 = tf.constant(self.num_timesteps - 1, dtype=tf.int32)
     img_0 = noise_fn(shape=shape, dtype=tf.float32)
-    img_0 = tf.concat([img_0, lr_up], axis=-1)
+   
     _, img_final = tf.while_loop(
       cond=lambda i_, _: tf.greater_equal(i_, 0),
       body=lambda i_, img_: [
         i_ - 1,
         self.p_sample(
-          denoise_fn=denoise_fn, x=img_, t=tf.fill([shape[0]], i_), noise_fn=noise_fn, return_pred_xstart=False)
+          denoise_fn=denoise_fn, up_lr=up_lr, x=img_, t=tf.fill([shape[0]], i_), noise_fn=noise_fn, return_pred_xstart=False)
       ],
       loop_vars=[i_0, img_0],
       shape_invariants=[i_0.shape, img_0.shape],
@@ -229,20 +229,20 @@ class GaussianDiffusion2:
     """
     Generate samples and keep track of prediction of x0
     """
-    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], (lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
+    up_lr = tf.expand_dims(tf.image.resize(lr_inp[0], (lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
                                   method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
     
     assert isinstance(shape, (tuple, list))
     i_0 = tf.constant(self.num_timesteps - 1, dtype=tf.int32)
     img_0 = noise_fn(shape=shape, dtype=tf.float32)  # [B, H, W, C]
-    img_0 = tf.concat([img_0,lr_up], axis=-1)
+    
     num_recorded_xstartpred = self.num_timesteps // include_xstartpred_freq
     xstartpreds_0 = tf.zeros([shape[0], num_recorded_xstartpred, *shape[1:]], dtype=tf.float32)  # [B, N, H, W, C]
 
     def _loop_body(i_, img_, xstartpreds_):
       # Sample p(x_{t-1} | x_t) as usual
       sample, pred_xstart = self.p_sample(
-        denoise_fn=denoise_fn, x=img_, t=tf.fill([shape[0]], i_), noise_fn=noise_fn, return_pred_xstart=True)
+        denoise_fn=denoise_fn, up_lr=up_lr, x=img_, t=tf.fill([shape[0]], i_), noise_fn=noise_fn, return_pred_xstart=True)
       assert sample.shape == pred_xstart.shape == shape
       # Keep track of prediction of x0
       insert_mask = tf.equal(tf.floordiv(i_, include_xstartpred_freq),
