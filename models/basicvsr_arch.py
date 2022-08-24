@@ -269,9 +269,9 @@ class BasicVSR(models.Model):
         self.conv_hr = layers.Conv2D(64, 3, 1, padding='same')
         self.conv_hr2 = layers.Conv2D(64, 3, 1, padding='same')
         self.conv_hr1 = layers.Conv2D(64, 3, 1, padding='same')
-        self.conv_last = layers.Conv2D(output_ch, 3, 1, padding='same', dtype=tf.float32)
-        self.conv_last2 = layers.Conv2D(output_ch, 3, 1, padding='same', dtype=tf.float32)
-        self.conv_last1 = layers.Conv2D(output_ch, 3, 1, padding='same', dtype=tf.float32)
+        self.conv_last = layers.Conv2D(output_ch, 3, 1, padding='same')
+        self.conv_last2 = layers.Conv2D(output_ch, 3, 1, padding='same')
+        self.conv_last1 = layers.Conv2D(output_ch, 3, 1, padding='same')
 
         self.pixel_shuffle = layers.Lambda(lambda x: tf.nn.depth_to_space(x, 2))
         # activation functions
@@ -347,7 +347,7 @@ class BasicVSR(models.Model):
                 
             out_j.append(tf.add(out, x_i[...,:3]))
         
-        return tf.stack(out_j, 1) if not self.scale else (tf.stack(out_j, 1), tf.stack(out_j1,1), tf.stack(out_j2,1))
+        return tf.cast(tf.stack(out_j, 1), tf.float32) if not self.scale else (tf.stack(out_j, 1), tf.stack(out_j1,1), tf.stack(out_j2,1))
    
     def build_model_with_grap(self, input_shape):
         inputs = keras.Input(shape=input_shape)
