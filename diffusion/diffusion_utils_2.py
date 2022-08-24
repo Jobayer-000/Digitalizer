@@ -204,7 +204,7 @@ class GaussianDiffusion2:
     """
     Generate samples
     """
-    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], shape=(lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
+    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], (lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
                                   method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
     
     assert isinstance(shape, (tuple, list))
@@ -229,7 +229,7 @@ class GaussianDiffusion2:
     """
     Generate samples and keep track of prediction of x0
     """
-    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], shape=(lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
+    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], (lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2]),
                                   method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
     
     assert isinstance(shape, (tuple, list))
