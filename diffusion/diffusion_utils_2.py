@@ -200,13 +200,17 @@ class GaussianDiffusion2:
     assert sample.shape == pred_xstart.shape
     return (sample, pred_xstart) if return_pred_xstart else sample
 
-  def p_sample_loop(self, denoise_fn, *, shape, noise_fn=tf.random.normal):
+  def p_sample_loop(self, denoise_fn,  lr_up, *, shape, noise_fn=tf.random.normal):
     """
     Generate samples
     """
+    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], shape=(lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2])),
+                                  method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
+    
     assert isinstance(shape, (tuple, list))
     i_0 = tf.constant(self.num_timesteps - 1, dtype=tf.int32)
     img_0 = noise_fn(shape=shape, dtype=tf.float32)
+    img_0 = tf.concat([img_0, lr_up], axis=-1)
     _, img_final = tf.while_loop(
       cond=lambda i_, _: tf.greater_equal(i_, 0),
       body=lambda i_, img_: [
@@ -221,14 +225,17 @@ class GaussianDiffusion2:
     assert img_final.shape == shape
     return img_final
 
-  def p_sample_loop_progressive(self, denoise_fn, *, shape, noise_fn=tf.random.normal, include_xstartpred_freq=50):
+  def p_sample_loop_progressive(self, denoise_fn, lr_inp, *, shape, noise_fn=tf.random.normal, include_xstartpred_freq=50):
     """
     Generate samples and keep track of prediction of x0
     """
+    lr_up = tf.expand_dims(tf.image.resize(lr_inp[0], shape=(lr_inp.shape[2], lr_inp.shape[3]) if len(lr_inp.shape)==5 else (lr_inp.shape[1], lr_inp.shape[2])),
+                                  method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
+    
     assert isinstance(shape, (tuple, list))
     i_0 = tf.constant(self.num_timesteps - 1, dtype=tf.int32)
     img_0 = noise_fn(shape=shape, dtype=tf.float32)  # [B, H, W, C]
-
+    img_0 = tf.concat([img_0,lr_up], axis=-1)
     num_recorded_xstartpred = self.num_timesteps // include_xstartpred_freq
     xstartpreds_0 = tf.zeros([shape[0], num_recorded_xstartpred, *shape[1:]], dtype=tf.float32)  # [B, N, H, W, C]
 
