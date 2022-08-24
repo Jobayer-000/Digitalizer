@@ -245,7 +245,7 @@ class GaussianDiffusion2:
         denoise_fn=denoise_fn, up_lr=up_lr, x=img_, t=tf.fill([shape[0]], i_), noise_fn=noise_fn, return_pred_xstart=True)
       assert sample.shape == pred_xstart.shape == shape
       # Keep track of prediction of x0
-      insert_mask = tf.equal(tf.floordiv(i_, include_xstartpred_freq),
+      insert_mask = tf.equal(tf.math.floordiv(i_, include_xstartpred_freq),
                              tf.range(num_recorded_xstartpred, dtype=tf.int32))
       insert_mask = tf.reshape(tf.cast(insert_mask, dtype=tf.float32),
                                [1, num_recorded_xstartpred, *([1] * len(shape[1:]))])  # [1, N, 1, 1, 1]
@@ -257,7 +257,7 @@ class GaussianDiffusion2:
       body=_loop_body,
       loop_vars=[i_0, img_0, xstartpreds_0],
       shape_invariants=[i_0.shape, img_0.shape, xstartpreds_0.shape],
-      back_prop=False
+      
     )
     assert img_final.shape == shape and xstartpreds_final.shape == xstartpreds_0.shape
     return img_final, xstartpreds_final  # xstart predictions should agree with img_final at step 0
