@@ -32,8 +32,7 @@ def get_sampler_t_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
             new_x, new_eps_pred = ab_step(x, ab_coef[i], new_eps, eps_pred)
             return new_x, new_eps_pred
 
-
-        eps_pred = tf.constant([x0,] * ab_order)
+        eps_pred = tf.tile(tf.expand_dims(x0,0), [ab_order, *[1]*len(x0.shape)])
         val = init_val
         for i in range(lower, upper):
           x0, eps_pred = ab_body_fn(i, x0, eps_pred, up_lr)
@@ -82,7 +81,7 @@ def get_sampler_ipndm(sde, eps_fn, num_step):
             return new_x, new_eps_pred
 
 
-        eps_pred = tf.constant([x0,] * 3)
+        eps_pred = tf.tile(tf.expand_dims(x0,0), [ab_order, *[1]*len(x0.shape)])
         for i in range(0,num_step):
             x0, eps_pred = ab_body_fn(x0, eps_pred)
             return x0, eps_pred      
@@ -120,10 +119,10 @@ def get_sampler_rho_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
             v_next, new_eps_cur_preds = ab_step(v_cur, ab_coef[i], eps_cur, eps_prev_preds)
             return v_next, new_eps_cur_preds
 
-        eps_pred = tf.constant([vT,] * highest_order)
-      
+        
+        eps_pred = tf.tile(tf.expand_dims(vT,0), [highest_order, *[1]*len(vT.shape)])
         for i in range(0, nfe):
-            vT, eps_pred = ab_body_fn(vT, eps_pred)
+            vT, eps_pred = ab_body_fn(i, vT, eps_pred)
             return vT, eps+pred
         x_eps = sde.v2x(vT, rev_ts[-1])
         return x_eps
