@@ -62,7 +62,7 @@ def get_rev_ts(exp_sde, num_step, ts_order, ts_phase="t"):
         rev_ts = tf.pow(
             tf.linspace(
                 tf.pow(t1, 1.0 / ts_order),
-                tf.power(t0, 1.0 / ts_order),
+                tf.pow(t0, 1.0 / ts_order),
                 num_step + 1
             ),
             ts_order
