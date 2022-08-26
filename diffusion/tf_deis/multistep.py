@@ -63,9 +63,10 @@ def get_ab_eps_coef_order0(sde, highest_order, timesteps):
     col_idx = tf.range(len(timesteps)-1)[:,None]
     idx = col_idx + tf.range(1)[None, :]
     vec_ts_poly = tf.gather(timesteps, idx)
+    print(timesteps[:-1])
     return tf.map_fn(
         _worker,
-   (timesteps[:-1], timesteps[1:], vec_ts_poly, 0, 10000))
+   (timesteps[:-1], timesteps[1:], vec_ts_poly, 10000))
 
 def get_ab_eps_coef(sde, highest_order, timesteps, order):
     assert isinstance(sde, MultiStepSDE)
