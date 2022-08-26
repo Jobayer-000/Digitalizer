@@ -38,8 +38,11 @@ def get_one_coef_per_step_fn(sde):
         j: coef_idx
         """
         t_start, t_end, ts_poly, coef_idx, num_item = x
+        print(0)
         integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
+        print(1)
         poly_coef = tf.map_fn(single_poly_coef, (t_inter, ts_poly, coef_idx))
+        print(3)
         return tf.reduce_sum(integrand * poly_coef) * dt
     return _worker
 
@@ -53,7 +56,10 @@ def get_coef_per_step_fn(sde, highest_order, order):
         t_start, t_end, ts_poly, num_item = x
         print(ts_poly)
         rtn = tf.zeros((highest_order+1, ), dtype=float)
+        print(rtn)
+        print(order)
         ts_poly = ts_poly[:order+1]
+        print(ts_ply)
         coef = tf.map_fn(eps_coef_fn, (t_start, t_end, ts_poly, jnp.flip(tf.range(order+1)), num_item))
         rtn = tf.concat([tf.ones_like(rtn[:order+1])*coef, rtn[order+1:]],axis=0)
         return rtn
@@ -64,7 +70,7 @@ def get_ab_eps_coef_order0(sde, highest_order, timesteps):
     col_idx = tf.range(len(timesteps)-1)[:,None]
     idx = col_idx + tf.range(1)[None, :]
     vec_ts_poly = tf.gather(timesteps, idx)
-    print(timesteps[:-1])
+    
     return tf.map_fn(
         _worker,
    (timesteps[:-1], timesteps[1:], vec_ts_poly, 10000))
