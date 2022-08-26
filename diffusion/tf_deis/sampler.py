@@ -18,7 +18,7 @@ def get_sampler(sde, eps_fn, ts_phase, ts_order, num_step, method="rho_rk",ab_or
 
 def get_sampler_t_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
     rev_ts = get_rev_ts(sde, num_step, ts_order, ts_phase=ts_phase)
-    print(rev_ts)
+    print(len(rev_ts))
     x_coef = sde.psi(rev_ts[:-1], rev_ts[1:])
     eps_coef = get_ab_eps_coef(sde, ab_order, rev_ts, ab_order)
     ab_coef = tf.concat([x_coef[:, None], eps_coef], axis=1)
