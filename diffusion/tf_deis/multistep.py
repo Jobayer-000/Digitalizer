@@ -38,17 +38,17 @@ def get_one_coef_per_step_fn(sde):
         j: coef_idx
         """
        
-        num_item=10000
-        t_start, t_end, ts_poly = x
+       
+        t_start, t_end, ts_poly, coef_idx, num_item = x
         print(0)
         integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
         print(1)
-        poly_coef = tf.map_fn(single_poly_coef, (t_inter, ts_poly, coef_idx))
+        poly_coef = tf.map_fn(single_poly_coef, (t_inter, tf.ones_like(t_inter)*ts_poly, tf.ones_like(t_inter)*coef_idx))
         print(3)
         return tf.reduce_sum(integrand * poly_coef) * dt
     return _worker
 
-def get_coef_per_step_fn(sde, highest_order, order):
+def get_coef_per_step_fn(sde, highest_order, order, num_item=10000):
     eps_coef_fn = get_one_coef_per_step_fn(sde)
     def _worker(x):
         """
@@ -59,7 +59,7 @@ def get_coef_per_step_fn(sde, highest_order, order):
         t_start, t_end, ts_poly= x
         rtn = tf.zeros((highest_order+1, ), dtype=float)
         ts_poly = ts_poly[:order+1]
-        coef = tf.map_fn(eps_coef_fn, (t_start, t_end, ts_poly, tf.range(order+1)[::-1]))
+        coef = tf.map_fn(eps_coef_fn, (tf.ones((order+1))*t_start, tf.ones((order+1))*t_end, ts_poly, tf.range(order+1)[::-1]), tf.ones((order+1))*num_item))
         rtn = tf.concat([tf.ones_like(rtn[:order+1])*coef, rtn[order+1:]],axis=0)
         return rtn
     return _worker
