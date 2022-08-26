@@ -59,7 +59,7 @@ def get_coef_per_step_fn(sde, highest_order, order, num_item=10000):
         t_start, t_end, ts_poly= x
         rtn = tf.zeros((highest_order+1, ), dtype=float)
         ts_poly = ts_poly[:order+1]
-        coef = tf.map_fn(eps_coef_fn, (tf.ones((order+1))*t_start, tf.ones((order+1))*t_end, ts_poly, tf.range(order+1)[::-1]), tf.ones((order+1))*num_item))
+        coef = tf.map_fn(eps_coef_fn, (tf.ones((order+1))*t_start, tf.ones((order+1))*t_end, ts_poly, tf.range(order+1)[::-1], tf.ones((order+1))*num_item))
         rtn = tf.concat([tf.ones_like(rtn[:order+1])*coef, rtn[order+1:]],axis=0)
         return rtn
     return _worker
