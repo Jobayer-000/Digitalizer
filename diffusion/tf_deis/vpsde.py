@@ -43,7 +43,7 @@ class VPSDE(ExpSDE, MultiStepSDE):
         self.t2alpha_fn = t2alpha_fn
         self.alpha2t_fn = alpha2t_fn
         self.alpha_start = 1.0
-        log_alpha_fn = lambda t: tf.math.log(self.t2alpha_fn(t))
+        self.log_alpha_fn = lambda t: tf.math.log(self.t2alpha_fn(t))
 
     @property
     def sampling_T(self):
@@ -57,7 +57,7 @@ class VPSDE(ExpSDE, MultiStepSDE):
         return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
 
     def eps_integrand(self, vec_t):
-        d_log_alpha_dtau = tf.map_fn(log_alpha_fn, vec_t)
+        d_log_alpha_dtau = tf.map_fn(self.log_alpha_fn, vec_t)
         integrand = -0.5 * d_log_alpha_dtau / jnp.sqrt(1 - self.t2alpha_fn(vec_t))
         return integrand
 
