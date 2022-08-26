@@ -57,7 +57,7 @@ class VPSDE(ExpSDE, MultiStepSDE):
         return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
 
     def eps_integrand(self, vec_t):
-        d_log_alpha_dtau = self.d_log_alpha_dtau_fn(vec_t)
+        d_log_alpha_dtau = tf.map_fn(log_alpha_fn, vec_t)
         integrand = -0.5 * d_log_alpha_dtau / jnp.sqrt(1 - self.t2alpha_fn(vec_t))
         return integrand
 
