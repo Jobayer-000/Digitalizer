@@ -14,14 +14,13 @@ def get_integrator_basis_fn(sde):
     return _worker
 
 
-def single_poly_coef(x):
+def single_poly_coef(t_val, ts_poly, coef_idx):
     """
     \prod_{k \neq j} \frac{\tau - t_{i+k}}{t_{i+j}-t_{i+k}}
     t_val: tau
     ts_poly: t_{i+k}
     j: coef_idx
     """
-    t_val, ts_poly, coef_idx = x
     num = t_val - ts_poly
     print(ts_poly)
     denum = ts_poly[coef_idx] - ts_poly
