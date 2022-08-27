@@ -83,7 +83,7 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
 
     col_idx = tf.range(len(timesteps)-order-1)[:,None]
     idx = col_idx + tf.range(order+1)[None, :]
-    vec_ts_poly = timesteps[idx]
+    vec_ts_poly = tf.gather(timesteps, idx)
     
     
     cur_coef = cur_coef_worker(timesteps[order:-1], timesteps[order+1:], vec_ts_poly) #[3, 4, (0,1,2,3)]
