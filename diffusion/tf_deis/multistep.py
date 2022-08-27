@@ -21,11 +21,11 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     ts_poly: t_{i+k}
     j: coef_idx
     """
-    num = t_val - ts_poly
+    num = t_val[...,None] - ts_poly
     print(num)
     print('ts', ts_poly)
     print(coef_idx)
-    denum = tf.gather(ts_poly, coef_idx, axis=-1) - ts_poly
+    denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
     print(denum)
     num_ = tf.cast(tf.scatter_nd(coef_idx[:,None], tf.ones_like(coef_idx)[:,None], num.shape), num.dtype)
     num = tf.where(num_==1., num_, num)
