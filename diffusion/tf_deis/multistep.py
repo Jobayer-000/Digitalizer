@@ -24,6 +24,7 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     num = t_val - ts_poly
     print(ts_poly)
     denum = tf.gather(ts_poly, coef_idx) - ts_poly
+    print(coef_idx)
     num_ = tf.scatter_nd(coef_idx, tf.ones_like(coef_idx), num.shape)
     num = tf.where(num_==1, num_, num)
     denum_ = tf.scatter_nd(coef_idx[:, None], tf.ones_like(coef_idx), denum.shape)
