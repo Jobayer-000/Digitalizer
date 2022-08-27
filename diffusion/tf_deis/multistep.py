@@ -33,37 +33,31 @@ def single_poly_coef(x):
 
 def get_one_coef_per_step_fn(sde):
     _eps_coef_worker_fn = get_integrator_basis_fn(sde)
-    def _worker(x):
+    def _worker(t_start, t_end, ts_poly, coef_idx, num_item):
         """
         C_{ij}
         j: coef_idx
         """
-       
-       
-        t_start, t_end, ts_poly, coef_idx, num_item = x
         print(0)
         integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
         print(1)
         print(len(t_inter), ts_poly)
-        poly_coef = tf.map_fn(single_poly_coef, (t_inter, [ts_poly]*tf.ones((len(t_inter))), tf.ones((len(t_inter)),tf.int32)*coef_idx))
+        poly_coef = single_poly_coef(t_inter, ts_poly, coef_idx)
         print(3)
         return tf.reduce_sum(integrand * poly_coef) * dt
     return _worker
 
-def get_coef_per_step_fn(sde, highest_order, order, num_item=10000):
+def get_coef_per_step_fn(sde, highest_order, order):
     eps_coef_fn = get_one_coef_per_step_fn(sde)
-    def _worker(x):
+    def _worker(t_start, t_end, ts_poly, num_item = 10000):
         """
         C_i
         #!: we do flip of j here!
         """
-        num_item = 10000
-        t_start, t_end, ts_poly= x
         rtn = tf.zeros((highest_order+1, ), dtype=float)
         ts_poly = ts_poly[:order+1]
-        print(t_start, t_end)
-        coef = tf.map_fn(eps_coef_fn, (tf.ones((order+1))*t_start, tf.ones((order+1))*t_end, ts_poly, 
-                                       tf.range(order+1)[::-1], tf.ones((order+1), dtype=tf.int32)*num_item))
+        
+        coef = eps_coef_fn(t_start, t_end, ts_poly, tf.range(order+1)[::-1], num_item)
         rtn = tf.concat([tf.ones_like(rtn[:order+1])*coef, rtn[order+1:]],axis=0)
         return rtn
     return _worker
@@ -74,9 +68,7 @@ def get_ab_eps_coef_order0(sde, highest_order, timesteps):
     idx = col_idx + tf.range(1)[None, :]
     vec_ts_poly = tf.gather(timesteps, idx)
     
-    return tf.map_fn(
-        _worker,
-   (timesteps[:-1], timesteps[1:], vec_ts_poly))
+    return _worker(timesteps[:-1], timesteps[1:], vec_ts_poly)
 
 def get_ab_eps_coef(sde, highest_order, timesteps, order):
     assert isinstance(sde, MultiStepSDE)
@@ -92,9 +84,7 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
     vec_ts_poly = timesteps[idx]
     
     
-    cur_coef = tf.map_fn(
-        cur_coef_worker,
-        (timesteps[order:-1], timesteps[order+1:], vec_ts_poly)) #[3, 4, (0,1,2,3)]
+    cur_coef = cur_coef_worker(timesteps[order:-1], timesteps[order+1:], vec_ts_poly) #[3, 4, (0,1,2,3)]
 
     return tf.concat(
         [
