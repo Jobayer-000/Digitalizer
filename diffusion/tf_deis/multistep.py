@@ -27,10 +27,13 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     print(coef_idx)
     denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
     print(denum)
-    num_ = tf.cast(tf.scatter_nd(coef_idx[:,None], tf.ones_like(coef_idx)[:,None], num.shape), num.dtype)
-    num = tf.where(num_==1., num_, num)
-    denum_ = tf.cast(tf.scatter_nd(coef_idx[:, None], tf.ones_like(coef_idx)[:,None], denum.shape),denum.dtype)
-    denum = tf.where(denum_==1., denum_, denum)
+    idx = tf.concat([tf.zeros((num.shape[1]),tf.int32)[:,None], tf.range(num.shape[1])[:,None],coef_idx[:,None]],axis=1)
+    print('idx', idx)
+    num = tf.tensor_scatter_nd_update(num, idx, tf.ones_like(coef_idx, tf.float32))
+    print('num',num)
+    d_idx = tf.concat([tf.zeros((num.shape[1]),tf.int32)[:,None], tf.range(num.shape[1])[:,None],coef_idx[:,None]],axis=1)
+    denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones_like(coef_idx, tf.float32))
+    print('denum', denum)
     return tf.reduce_prod(num) / tf.reduce_prod(denum)
 
 
