@@ -35,7 +35,7 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
                   tf.tile(tf.range(num.shape[-2])[None, :][None, ...],  [num.shape[0], coef_idx.shape[0], 1]),
                   tf.tile(coef_idx[:,None][None,...], [num.shape[0], 1,num.shape[-2]])],
             axis=-1),
-        [-1, coef_idx.shape[0]])
+        [-1, 4])
    
          
     print('idx', idx)
