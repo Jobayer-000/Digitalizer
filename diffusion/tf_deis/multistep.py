@@ -22,7 +22,7 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     j: coef_idx
     """
     assert ts_poly.shape[0] == t_val.shape[-1]
-    num = tf.tile(t_val[:,None,...][...,None], [1,ts_poly.shape[0],1,1])-tf_poly
+    num = tf.tile(t_val[:,None,...][...,None], [1,ts_poly.shape[0],1,1])-ts_poly
     print('num', num)
     print('ts', ts_poly)
     print('coef_idx', coef_idx)
