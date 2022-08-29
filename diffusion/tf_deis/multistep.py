@@ -21,8 +21,8 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     ts_poly: t_{i+k}
     j: coef_idx
     """
-    num = t_val[...,None] - ts_poly
-    print(num)
+    num = t_val[None,:] - ts_poly
+    print('num', num)
     print('ts', ts_poly)
     print(coef_idx)
     denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
