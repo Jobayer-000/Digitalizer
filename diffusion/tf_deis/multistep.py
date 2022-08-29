@@ -21,18 +21,28 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     ts_poly: t_{i+k}
     j: coef_idx
     """
-    num = t_val[None,:] - ts_poly
+    assert ts_poly.shape[0] == t_val.shape[-1]
+    num = tf.tile(t_val[:,None,...], [1,ts_poly.shape[0],1,1])-tf_poly
     print('num', num)
     print('ts', ts_poly)
-    print(coef_idx)
+    print('coef_idx', coef_idx)
     denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
-    print(denum)
-    idx = tf.concat([tf.zeros((num.shape[1]),tf.int32)[:,None], tf.range(num.shape[1])[:,None],coef_idx[:,None]],axis=1)
+    print('denum',denum)
+    idx = tf.reshape(
+        tf.stack([
+                  tf.tile(tf.range(num.shape[0])[:, None][...,None],  [1, coef_idx.shape[0], num.shape[-2]]),
+                  tf.tile(coef_idx[::-1][:, None][None,...],  [num.shape[0], 1, num.shape[-2]]),
+                  tf.tile(tf.range(num.shape[-2])[None, :][None, ...],  [num.shape[0], coef_idx.shape[0], 1]),
+                  tf.tile(coef_idx[:,None][None,...], [num.shape[0], 1,num.shape[-2]])],
+            axis=-1),
+        [-1, coef_idx.shape[0]])
+   
+         
     print('idx', idx)
-    num = tf.tensor_scatter_nd_update(num, idx, tf.ones_like(coef_idx, tf.float32))
+    num = tf.tensor_scatter_nd_update(num, idx, tf.ones((tf.reduce_prod(idx.shape[:-1])), tf.float32))
     print('num',num)
-    d_idx = tf.concat([tf.zeros((num.shape[1]),tf.int32)[:,None], tf.range(num.shape[1])[:,None],coef_idx[:,None]],axis=1)
-    denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones_like(coef_idx, tf.float32))
+    d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], ind],axis=1) for i in range(denum.shape[0])],axis=0)
+    denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]),tf.float32))
     print('denum', denum)
     return tf.reduce_prod(num) / tf.reduce_prod(denum)
 
