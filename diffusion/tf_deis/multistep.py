@@ -24,9 +24,9 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     
     try:
         num = tf.tile(t_val[:,None,...][...,None], [1,ts_poly.shape[-1],1,1])-ts_poly
-        print('num', t_val)
+        print('t_val', t_val)
         print('num', num)
-        print('ts', ts_poly)
+        print('ts_ply', ts_poly)
         print('coef_idx', coef_idx)
         denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
         print('denum',denum)
@@ -59,12 +59,11 @@ def get_one_coef_per_step_fn(sde):
         C_{ij}
         j: coef_idx
         """
-        print(0)
-        integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
-        print(1)
-        print(t_end, t_start)
+        print('t_start', t_start)
+        print('t_end', t_end)
+        integrand, t_inter, dt = _eps_coef_worker_fn(t_start[0], t_end[0], num_item)
         poly_coef = single_poly_coef(t_inter, ts_poly, coef_idx)
-        print(3)
+        print('single_poly_fin')
         return tf.reduce_sum(integrand * poly_coef) * dt
     return _worker
 
@@ -97,7 +96,7 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
         return get_ab_eps_coef_order0(sde, highest_order, timesteps)
     
     prev_coef = get_ab_eps_coef(sde, highest_order, timesteps[:order+1], order=order-1)
-
+    print('prev_coef_fin')
     cur_coef_worker = get_coef_per_step_fn(sde, highest_order, order)
 
     col_idx = tf.range(len(timesteps)-order-1)[:,None]
@@ -106,7 +105,7 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
     print('rr', timesteps[order:-1], timesteps[order+1:], vec_ts_poly)
     
     cur_coef = cur_coef_worker(timesteps[order:-1], timesteps[order+1:], vec_ts_poly) #[3, 4, (0,1,2,3)]
-
+    print('cur_coef_fin')
     return tf.concat(
         [
             prev_coef,
