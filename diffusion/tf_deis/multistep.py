@@ -6,7 +6,7 @@ def get_integrator_basis_fn(sde):
     def _worker(t_start, t_end, num_item):
         dt = (t_end - t_start) / tf.cast(num_item,tf.float32)
       
-        t_inter = tf.linspace(t_start, t_end, num_item)
+        t_inter = tf.transpose(tf.cast(tf.linspace(t_start, t_end, num_item), tf.float32), [1,0])
         psi_coef = sde.psi(t_inter, t_end)
         integrand = sde.eps_integrand(t_inter)
 
@@ -23,7 +23,8 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     """
     
     try:
-        num = tf.tile(t_val[:,None,...][...,None], [1,ts_poly.shape[-1],1,1])-ts_poly
+        
+        num = tf.tile(t_val[...,None] - tf.tile(ts_poly[:, 1, :], [1, t_val.shape[1], 1])[:, None,...], [1, ts_poly.shape[-1], 1, 1])
         print('t_val', t_val)
         print('num', num)
         print('ts_ply', ts_poly)
