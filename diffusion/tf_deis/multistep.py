@@ -62,7 +62,7 @@ def get_one_coef_per_step_fn(sde):
         print(0)
         integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
         print(1)
-        print(tf_end, t_start)
+        print(t_end, t_start)
         poly_coef = single_poly_coef(t_inter, ts_poly, coef_idx)
         print(3)
         return tf.reduce_sum(integrand * poly_coef) * dt
