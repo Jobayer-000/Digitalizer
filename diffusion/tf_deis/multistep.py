@@ -5,7 +5,7 @@ from sde import MultiStepSDE
 def get_integrator_basis_fn(sde):
     def _worker(t_start, t_end, num_item):
         dt = (t_end - t_start) / tf.cast(num_item,tf.float32)
-
+      
         t_inter = tf.linspace(t_start, t_end, num_item)
         psi_coef = sde.psi(t_inter, t_end)
         integrand = sde.eps_integrand(t_inter)
@@ -62,7 +62,7 @@ def get_one_coef_per_step_fn(sde):
         print(0)
         integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
         print(1)
-        print(len(t_inter), ts_poly)
+        print(tf_end, t_start)
         poly_coef = single_poly_coef(t_inter, ts_poly, coef_idx)
         print(3)
         return tf.reduce_sum(integrand * poly_coef) * dt
@@ -88,7 +88,7 @@ def get_ab_eps_coef_order0(sde, highest_order, timesteps):
     col_idx = tf.range(len(timesteps)-1)[:,None]
     idx = col_idx + tf.range(1)[None, :]
     vec_ts_poly = tf.gather(timesteps, idx)
-    
+    print('vec_ts_poly', vec_ts_poly)
     return _worker(timesteps[:-1], timesteps[1:], vec_ts_poly)
 
 def get_ab_eps_coef(sde, highest_order, timesteps, order):
