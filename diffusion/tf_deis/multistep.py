@@ -29,7 +29,7 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
         print('ts', ts_poly)
         print('coef_idx', coef_idx)
         denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
-         print('denum',denum)
+        print('denum',denum)
         idx = tf.reshape(
             tf.stack([
                   tf.tile(tf.range(num.shape[0])[:, None][...,None],  [1, coef_idx.shape[0], num.shape[-2]]),
