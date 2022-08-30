@@ -24,7 +24,7 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     
     num = tf.tile(t_val[:,None,...][...,None], [1,ts_poly.shape[-1],1,1])-ts_poly
     print('num', t_val)
-    print('num' num)
+    print('num', num)
     print('ts', ts_poly)
     print('coef_idx', coef_idx)
     denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
