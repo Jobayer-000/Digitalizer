@@ -43,8 +43,8 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
         print('idx', idx)
         num = tf.tensor_scatter_nd_update(num, idx, tf.ones((tf.reduce_prod(idx.shape[:-1])), tf.float32))
         print('num_set',num)
-        d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], coef_idx],axis=1) for i in range(denum.shape[0])],axis=0)
-        denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]),tf.float32))
+        d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], coef_idx],axis=1) for i in range(denum.shape[0])], axis=0)
+        denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]), tf.float32))
         print('denum_set', denum)
         return tf.reduce_prod(num) / tf.reduce_prod(denum)
     except:
@@ -103,7 +103,7 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
     col_idx = tf.range(len(timesteps)-order-1)[:,None]
     idx = col_idx + tf.range(order+1)[None, :]
     vec_ts_poly = tf.gather(timesteps, idx)
-    
+    print('rr', timesteps[order:-1], timesteps[order+1:], vec_ts_poly)
     
     cur_coef = cur_coef_worker(timesteps[order:-1], timesteps[order+1:], vec_ts_poly) #[3, 4, (0,1,2,3)]
 
