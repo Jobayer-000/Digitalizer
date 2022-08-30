@@ -22,16 +22,14 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     j: coef_idx
     """
     
-    try:
-        
-        num = tf.tile(t_val[...,None] - tf.tile(ts_poly[:, 1, :], [1, t_val.shape[1], 1])[:, None,...], [1, ts_poly.shape[-1], 1, 1])
-        print('t_val', t_val)
-        print('num', num)
-        print('ts_ply', ts_poly)
-        print('coef_idx', coef_idx)
-        denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
-        print('denum',denum)
-        idx = tf.reshape(
+    num = tf.tile(t_val[...,None] - tf.tile(ts_poly[:, 1, :], [1, t_val.shape[1], 1])[:, None,...], [1, ts_poly.shape[-1], 1, 1])
+    print('t_val', t_val)
+    print('num', num)
+    print('ts_ply', ts_poly)
+    print('coef_idx', coef_idx)
+    denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
+    print('denum',denum)
+    idx = tf.reshape(
             tf.stack([
                   tf.tile(tf.range(num.shape[0])[:, None][...,None],  [1, coef_idx.shape[0], num.shape[-2]]),
                   tf.tile(coef_idx[::-1][:, None][None,...],  [num.shape[0], 1, num.shape[-2]]),
@@ -41,16 +39,13 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
             [-1, 4])
    
          
-        print('idx', idx)
-        num = tf.tensor_scatter_nd_update(num, idx, tf.ones((tf.reduce_prod(idx.shape[:-1])), tf.float32))
-        print('num_set',num)
-        d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], coef_idx],axis=1) for i in range(denum.shape[0])], axis=0)
-        denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]), tf.float32))
-        print('denum_set', denum)
-        return tf.reduce_prod(num) / tf.reduce_prod(denum)
-    except:
-        return 0.4
-
+    print('idx', idx)
+    num = tf.tensor_scatter_nd_update(num, idx, tf.ones((tf.reduce_prod(idx.shape[:-1])), tf.float32))
+    print('num_set',num)
+    d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], coef_idx],axis=1) for i in range(denum.shape[0])], axis=0)
+    denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]), tf.float32))
+    print('denum_set', denum)
+    return tf.reduce_prod(num) / tf.reduce_prod(denum)
 
 
 def get_one_coef_per_step_fn(sde):
@@ -79,6 +74,7 @@ def get_coef_per_step_fn(sde, highest_order, order):
         ts_poly = ts_poly[:order+1]
         
         coef = eps_coef_fn(t_start, t_end, ts_poly, tf.range(order+1)[::-1], num_item)
+        print(rtn)
         rtn = tf.concat([tf.ones_like(rtn[:order+1])*coef, rtn[order+1:]],axis=0)
         return rtn
     return _worker
