@@ -22,30 +22,33 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     j: coef_idx
     """
     
-    num = tf.tile(t_val[:,None,...][...,None], [1,ts_poly.shape[-1],1,1])-ts_poly
-    print('num', t_val)
-    print('num', num)
-    print('ts', ts_poly)
-    print('coef_idx', coef_idx)
-    denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
-    print('denum',denum)
-    idx = tf.reshape(
-        tf.stack([
+    try:
+        num = tf.tile(t_val[:,None,...][...,None], [1,ts_poly.shape[-1],1,1])-ts_poly
+        print('num', t_val)
+        print('num', num)
+        print('ts', ts_poly)
+        print('coef_idx', coef_idx)
+        denum = tf.gather(ts_poly, coef_idx, axis=-1)[...,None] - ts_poly
+         print('denum',denum)
+        idx = tf.reshape(
+            tf.stack([
                   tf.tile(tf.range(num.shape[0])[:, None][...,None],  [1, coef_idx.shape[0], num.shape[-2]]),
                   tf.tile(coef_idx[::-1][:, None][None,...],  [num.shape[0], 1, num.shape[-2]]),
                   tf.tile(tf.range(num.shape[-2])[None, :][None, ...],  [num.shape[0], coef_idx.shape[0], 1]),
                   tf.tile(coef_idx[:,None][None,...], [num.shape[0], 1,num.shape[-2]])],
-            axis=-1),
-        [-1, 4])
+                 axis=-1),
+            [-1, 4])
    
          
-    print('idx', idx)
-    num = tf.tensor_scatter_nd_update(num, idx, tf.ones((tf.reduce_prod(idx.shape[:-1])), tf.float32))
-    print('num',num)
-    d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], coef_idx],axis=1) for i in range(denum.shape[0])],axis=0)
-    denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]),tf.float32))
-    print('denum', denum)
-    return tf.reduce_prod(num) / tf.reduce_prod(denum)
+        print('idx', idx)
+        num = tf.tensor_scatter_nd_update(num, idx, tf.ones((tf.reduce_prod(idx.shape[:-1])), tf.float32))
+        print('num_set',num)
+        d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], coef_idx],axis=1) for i in range(denum.shape[0])],axis=0)
+        denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]),tf.float32))
+        print('denum_set', denum)
+        return tf.reduce_prod(num) / tf.reduce_prod(denum)
+    except:
+        return 0.4
 
 
 
