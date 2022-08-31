@@ -76,8 +76,8 @@ def get_coef_per_step_fn(sde, highest_order, order):
         coef = eps_coef_fn(t_start, t_end, ts_poly, tf.range(order+1)[::-1], num_item)
         print('rtn', rtn)
         print('order',order)
-        print('coef', coef)
-        print(tf.ones_like(rtn[:order+1])*coef)
+        print('rtn', rtn)
+        print(tf.ones_like(rtn[:,:order+1])*coef)
         print('order', order)
         rtn = tf.concat([tf.ones_like(rtn[:order+1])*coef, rtn[order+1:]],axis=0)
         return rtn
