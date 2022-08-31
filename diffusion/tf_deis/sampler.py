@@ -25,7 +25,7 @@ def get_sampler_t_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
 
     def sampler(x0, up_lr):
         def ab_body_fn(i, x, eps_pred, up_lr):
-            x, eps_pred = val
+           
             s_t= rev_ts[i]
             
             new_eps = eps_fn(x, up_lr)
