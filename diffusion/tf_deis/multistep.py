@@ -22,7 +22,7 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     j: coef_idx
     """
     
-    num = tf.tile(tf.expand_dims(t_val[...,None] - tf.tile(ts_poly[:, None, :], [1, t_val.shape[1], 1]), 1), [1, ts_poly.shape[-1], 1, 1])
+    num = tf.tile(tf.expand_dims(t_val[...,None], 1), [1, ts_poly.shape[-1], 1, 1]) - tf.tile(ts_poly[:, None, :], [1, t_val.shape[1], 1])
     print('t_val', t_val)
     print('num', num)
     print('ts_ply', ts_poly)
