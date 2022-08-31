@@ -34,7 +34,7 @@ def get_sampler_t_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
 
         eps_pred = tf.tile(tf.expand_dims(x0,0), [ab_order, *[1]*len(x0.shape)])
         
-        for i in range(lower, upper):
+        for i in range(num_step):
           x0, eps_pred = ab_body_fn(i, x0, eps_pred, up_lr)
           return x0,eps_pred
         return x0
