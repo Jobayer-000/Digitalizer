@@ -71,7 +71,7 @@ def get_coef_per_step_fn(sde, highest_order, order):
         #!: we do flip of j here!
         """
         rtn = tf.zeros((highest_order+1, ), dtype=float)
-        ts_poly = ts_poly[:order+1]
+        ts_poly = ts_poly[:,:order+1]
         
         coef = eps_coef_fn(t_start, t_end, ts_poly, tf.range(order+1)[::-1], num_item)
         print('rtn', rtn)
