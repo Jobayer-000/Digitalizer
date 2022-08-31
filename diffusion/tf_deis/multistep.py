@@ -23,12 +23,7 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     """
     
     num = tf.tile(tf.expand_dims(t_val[...,None] - tf.tile(ts_poly[:, None, :], [1, t_val.shape[1], 1]), 1), [1, ts_poly.shape[-1], 1, 1])
-    print('t_val', t_val)
-    print('num', num)
-    print('ts_ply', ts_poly)
-    print('coef_idx', coef_idx)
     denum = tf.gather(ts_poly, coef_idx, axis=-1)[:,None,:] - ts_poly[...,None]
-    print('denum',denum)
     idx = tf.reshape(
             tf.stack([
                   tf.tile(tf.range(num.shape[0])[:, None][...,None],  [1, coef_idx.shape[0], num.shape[-2]]),
@@ -39,12 +34,9 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
             [-1, 4])
    
          
-    print('idx', idx)
     num = tf.tensor_scatter_nd_update(num, idx, tf.ones((tf.reduce_prod(idx.shape[:-1])), tf.float32))
-    print('num_set',num)
     d_idx = tf.concat([tf.stack([tf.ones_like(coef_idx)*i, coef_idx[::-1], coef_idx],axis=1) for i in range(denum.shape[0])], axis=0)
     denum = tf.tensor_scatter_nd_update(denum, d_idx, tf.ones((denum.shape[0]*denum.shape[1]), tf.float32))
-    print('denum_set', denum)
     return tf.reduce_prod(num, axis=-1) / tf.reduce_prod(denum, axis=-1)[...,None]
 
 
@@ -55,11 +47,8 @@ def get_one_coef_per_step_fn(sde):
         C_{ij}
         j: coef_idx
         """
-        print('t_start', t_start)
-        print('t_end', t_end)
         integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
         poly_coef = single_poly_coef(t_inter, ts_poly, coef_idx)
-        print('single_poly_fin')
         return tf.reduce_sum(integrand[:,None,:] * poly_coef, -1) * dt[...,None]
     return _worker
 
@@ -74,11 +63,6 @@ def get_coef_per_step_fn(sde, highest_order, order):
         ts_poly = ts_poly[:,:order+1]
         
         coef = eps_coef_fn(t_start, t_end, ts_poly, tf.range(order+1)[::-1], num_item)
-        print('rtn', rtn)
-        print('order',order)
-        print('rtn', rtn)
-        print(tf.ones_like(rtn[:order+1])*coef)
-        print('order', order)
         rtn = tf.concat([coef, tf.tile(rtn[order+1:][None,...], [coef.shape[0],1])], axis=-1)
         return rtn
     return _worker
@@ -88,7 +72,6 @@ def get_ab_eps_coef_order0(sde, highest_order, timesteps):
     col_idx = tf.range(len(timesteps)-1)[:,None]
     idx = col_idx + tf.range(1)[None, :]
     vec_ts_poly = tf.gather(timesteps, idx)
-    print('vec_ts_poly', vec_ts_poly)
     return _worker(timesteps[:-1], timesteps[1:], vec_ts_poly)
 
 def get_ab_eps_coef(sde, highest_order, timesteps, order):
@@ -97,16 +80,13 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
         return get_ab_eps_coef_order0(sde, highest_order, timesteps)
     
     prev_coef = get_ab_eps_coef(sde, highest_order, timesteps[:order+1], order=order-1)
-    print('prev_coef_fin')
     cur_coef_worker = get_coef_per_step_fn(sde, highest_order, order)
 
     col_idx = tf.range(len(timesteps)-order-1)[:,None]
     idx = col_idx + tf.range(order+1)[None, :]
     vec_ts_poly = tf.gather(timesteps, idx)
-    print('rr', timesteps[order:-1], timesteps[order+1:], vec_ts_poly)
     
     cur_coef = cur_coef_worker(timesteps[order:-1], timesteps[order+1:], vec_ts_poly) #[3, 4, (0,1,2,3)]
-    print('cur_coef_fin')
     return tf.concat(
         [
             prev_coef,
@@ -117,6 +97,6 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
 
 def ab_step(x, ei_coef, new_eps, eps_pred):
     x_coef, eps_coef = ei_coef[0], ei_coef[1:]
-    full_eps = tf.concat([new_eps[None], eps_pred])
+    full_eps = tf.concat([new_eps[None], eps_pred], axis=0)
     eps_term = tf.einsum("i,i...->...", eps_coef, full_eps)
     return x_coef * x + eps_term, full_eps[:-1]
