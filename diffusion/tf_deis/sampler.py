@@ -36,6 +36,7 @@ def get_sampler_t_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
         for i in range(num_step):
           x0, eps_pred = ab_body_fn(i, x0, eps_pred, up_lr)
           return x0,eps_pred
+        print('x0', x0)
         return x0
     return sampler
 
