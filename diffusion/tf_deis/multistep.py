@@ -77,7 +77,7 @@ def get_coef_per_step_fn(sde, highest_order, order):
         print('rtn', rtn)
         print('order',order)
         print('rtn', rtn)
-        print(tf.ones_like(rtn[:,:order+1])*coef)
+        print(tf.ones_like(rtn[:order+1])*coef)
         print('order', order)
         rtn = tf.concat([tf.ones_like(rtn[:order+1])*coef, rtn[order+1:]],axis=0)
         return rtn
