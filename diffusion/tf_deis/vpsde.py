@@ -78,9 +78,9 @@ class VPSDE(ExpSDE, MultiStepSDE):
         coef = tf.sqrt(self.alpha_start / self.t2alpha_fn(t))
         return v / coef
 
-def get_interp_fn(_xp, _fp):
+def get_interp_fn(xp, fp):
   def _fn(x):
-      if tf.shape(_xp) != tf.shape(_fp) or tf.rank(_xp) != 1:
+      if tf.shape(xp) != tf.shape(fp) or tf.rank(xp) != 1:
           raise ValueError("xp and fp must be one-dimensional arrays of equal size")
       
 
