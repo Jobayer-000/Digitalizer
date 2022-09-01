@@ -6,7 +6,7 @@ def get_integrator_basis_fn(sde):
     def _worker(t_start, t_end, num_item):
         dt = tf.cast((t_end - t_start) / num_item,tf.float32)
       
-        t_inter = tf.transpose(tf.linspace(t_start, t_end, num_item), [1,0])
+        t_inter = tf.cast(tf.transpose(tf.linspace(t_start, t_end, num_item), [1,0]), tf.float32)
         psi_coef = sde.psi(t_inter, t_end[...,None])
         integrand = sde.eps_integrand(t_inter)
 
