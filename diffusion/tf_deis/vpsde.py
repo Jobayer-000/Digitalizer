@@ -86,8 +86,7 @@ def get_interp_fn(xp_, fp):
           raise ValueError("xp and fp must be one-dimensional arrays of equal size")
       
       x = tf.cast(x, tf.float32)
-      print('x',x.shape)
-      print('xp',xp_.shape)
+
       if len(x.shape)>len(xp_.shape):
             xp = tf.tile(xp_[None,...], [x.shape[0], 1])
             i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
