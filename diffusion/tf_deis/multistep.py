@@ -22,8 +22,8 @@ def single_poly_coef(t_val, ts_poly, coef_idx):
     j: coef_idx
     """
     
-    num = tf.tile(tf.expand_dims(t_val[...,None] - tf.tile(ts_poly[:, None, :], [1, t_val.shape[1], 1]), 1), [1, ts_poly.shape[-1], 1, 1])
-    denum = tf.gather(ts_poly, coef_idx, axis=-1)[:,None,:] - ts_poly[...,None]
+    num = tf.tile(tf.expand_dims(t_val[...,None] - tf.tile(tf.cast(ts_poly, tf.float32)[:, None, :], [1, t_val.shape[1], 1]), 1), [1, ts_poly.shape[-1], 1, 1])
+    denum = tf.cast(tf.gather(ts_poly, coef_idx, axis=-1)[:,None,:] - ts_poly[...,None], tf.float32)
     idx = tf.reshape(
             tf.stack([
                   tf.tile(tf.range(num.shape[0])[:, None][...,None],  [1, coef_idx.shape[0], num.shape[-2]]),
