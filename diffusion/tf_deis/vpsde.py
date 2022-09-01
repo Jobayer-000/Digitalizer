@@ -99,9 +99,8 @@ def get_interp_fn(xp, fp):
 class DiscreteVPSDE(VPSDE):
     def __init__(self, discrete_alpha):
         j_alphas = tf.convert_to_tensor(discrete_alpha)
-        j_times = tf.convert_to_tensor(
-            tf.range(len(discrete_alpha))
-        )
+        j_times = tf.range(len(discrete_alpha), dtype=tf.float32)
+
         # use a piecewise linear function to fit alpha
         _t2alpha_fn = get_interp_fn(j_times, j_alphas)
         _alpha2t_fn = get_interp_fn(2.0 - j_alphas, j_times)
