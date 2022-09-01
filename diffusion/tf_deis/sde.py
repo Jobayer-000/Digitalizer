@@ -103,8 +103,8 @@ def get_rev_ts(exp_sde, num_step, ts_order, ts_phase="t"):
             l = np.array([i for i in range(int(t1), int(t0), -1) if i not in np_rev_ts][-remain_steps:], dtype=int)
             np_rev_ts = np.concatenate([np_rev_ts, l], axis=0)
             np_ts = np.sort(np_rev_ts)
-            rev_ts = tf.from_numpy(np.flip(np_ts).copy())
+            rev_ts = tf.convert_to_tensor(np.flip(np_ts).copy())
         else:
-            rev_ts = tf.from_numpy(rev_ts, dtype=tf.int32)
+            rev_ts = tf.convert_to_tensor(rev_ts, dtype=tf.int32)
 
     return rev_ts
