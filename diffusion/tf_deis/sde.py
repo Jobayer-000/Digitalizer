@@ -105,6 +105,6 @@ def get_rev_ts(exp_sde, num_step, ts_order, ts_phase="t"):
             np_ts = np.sort(np_rev_ts)
             rev_ts = tf.convert_to_tensor(np.flip(np_ts).copy())
         else:
-            rev_ts = tf.convert_to_tensor(rev_ts, dtype=tf.int32)
+            rev_ts = tf.convert_to_tensor(np.asarray(rev_ts, dtype=np.int32))
 
     return rev_ts
