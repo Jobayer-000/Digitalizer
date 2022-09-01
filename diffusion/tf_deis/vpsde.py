@@ -54,6 +54,7 @@ class VPSDE(ExpSDE, MultiStepSDE):
         return self._sampling_eps
 
     def psi(self, t_start, t_end):
+        
         return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
 
     def eps_integrand(self, vec_t):
@@ -83,8 +84,10 @@ def get_interp_fn(xp, fp):
       if tf.shape(xp) != tf.shape(fp) or tf.rank(xp) != 1:
           raise ValueError("xp and fp must be one-dimensional arrays of equal size")
       
-
+      print('i', i)
+      print('fp', fp)
       i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
+      print('i', i)
       df = fp[i] - fp[i - 1]
       dx = xp[i] - xp[i - 1]
       delta = x - xp[i - 1]
