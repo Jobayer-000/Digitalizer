@@ -85,6 +85,8 @@ def get_interp_fn(xp, fp):
           raise ValueError("xp and fp must be one-dimensional arrays of equal size")
       
       x = tf.cast(x, tf.float32)
+      
+      
       i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
       df = tf.gather(fp,i) - tf.gather(fp, i - 1)
       dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
@@ -95,7 +97,7 @@ def get_interp_fn(xp, fp):
 
 class DiscreteVPSDE(VPSDE):
     def __init__(self, discrete_alpha):
-        j_alphas = tf.convert_to_tensor(discrete_alpha)
+        j_alphas = tf.convert_to_tensor(discrete_alpha, tf.float32)
         j_times = tf.range(len(discrete_alpha), dtype=tf.float32)
 
         # use a piecewise linear function to fit alpha
