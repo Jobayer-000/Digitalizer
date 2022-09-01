@@ -56,6 +56,7 @@ def get_rev_ts(exp_sde, num_step, ts_order, ts_phase="t"):
     #assert isinstance(exp_sde, ExpSDE), "only support ExpSDE now"
 
     t0, t1 = exp_sde.sampling_eps, exp_sde.sampling_T
+    t0, t1 = tf.cast(t0, tf.float32), tf.cast(t1, tf.float32)
     if not exp_sde.is_continuous:
         t0 = t0 + 1e-1
     if ts_phase=="t":
