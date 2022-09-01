@@ -30,8 +30,10 @@ def get_sampler_t_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
             s_t= rev_ts[i]
             new_eps = eps_fn(x, up_lr)
             print('new_eps', new_eps)
+            print(tf.reduce_mean(new_eps))
             new_x, new_eps_pred = ab_step(x, ab_coef[i], new_eps, eps_pred)
             print('new_x', new_x)
+            print(tf.reduce_mean(new_x))
             return new_x, new_eps_pred
 
         eps_pred = tf.tile(tf.expand_dims(x0,0), [ab_order,1,1,1,1,1])
