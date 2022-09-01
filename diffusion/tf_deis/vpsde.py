@@ -105,7 +105,7 @@ class DiscreteVPSDE(VPSDE):
         _t2alpha_fn = get_interp_fn(j_times, j_alphas)
         _alpha2t_fn = get_interp_fn(2.0 - j_alphas, j_times)
         t2alpha_fn = lambda item: tf.clip_by_value(
-            _t2alpha_fn(item), clip_value_min=1e-7, clip_vale_max=1.0 - 1e-7
+            _t2alpha_fn(item), clip_value_min=1e-7, clip_value_max=1.0 - 1e-7
         )
         alpha2t_fn = lambda item: tf.clip_by_value(
             _alpha2t_fn(2.0 - item), clip_value_min=j_times[0], clip_value_max=j_times[-1]
