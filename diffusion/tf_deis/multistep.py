@@ -4,9 +4,9 @@ from sde import MultiStepSDE
 
 def get_integrator_basis_fn(sde):
     def _worker(t_start, t_end, num_item):
-        dt = (t_end - t_start) / tf.cast(num_item,tf.float32)
+        dt = (t_end - t_start) / tf.cast(num_item)
       
-        t_inter = tf.transpose(tf.cast(tf.linspace(t_start, t_end, num_item)), [1,0])
+        t_inter = tf.transpose(tf.cast(tf.linspace(t_start, t_end, num_item), tf.float32), [1,0])
         psi_coef = sde.psi(t_inter, t_end[...,None])
         integrand = sde.eps_integrand(t_inter)
 
