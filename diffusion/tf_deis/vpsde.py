@@ -54,7 +54,8 @@ class VPSDE(ExpSDE, MultiStepSDE):
         return self._sampling_eps
 
     def psi(self, t_start, t_end):
-        
+        if len(t_start.shape)>len(t_end.shape):
+            t_end = t_end[...,None]
         return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
 
     def eps_integrand(self, vec_t):
