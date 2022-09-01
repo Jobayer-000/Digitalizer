@@ -26,10 +26,11 @@ def get_sampler_t_ab(sde, eps_fn, ts_phase, ts_order, num_step, ab_order):
         def ab_body_fn(i, x, eps_pred, up_lr):
            
             s_t= rev_ts[i]
-            print('new_eps', new_eps)
+            
             new_eps = eps_fn(x, up_lr)
-            print('new_eps_after', new_eps)
+            print('new_eps', new_eps)
             new_x, new_eps_pred = ab_step(x, ab_coef[i], new_eps, eps_pred)
+            print('new_eps_after', new_eps)
             return new_x, new_eps_pred
 
         eps_pred = tf.tile(tf.expand_dims(x0,0), [ab_order,1,1,1,1,1])
