@@ -53,7 +53,7 @@ class MultiStepSDE(abc.ABC):
         pass
 
 def get_rev_ts(exp_sde, num_step, ts_order, ts_phase="t"):
-    assert isinstance(exp_sde, ExpSDE), "only support ExpSDE now"
+    #assert isinstance(exp_sde, ExpSDE), "only support ExpSDE now"
 
     t0, t1 = exp_sde.sampling_eps, exp_sde.sampling_T
     if not exp_sde.is_continuous:
