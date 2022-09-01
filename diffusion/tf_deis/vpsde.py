@@ -84,11 +84,8 @@ def get_interp_fn(xp, fp):
       if tf.shape(xp) != tf.shape(fp) or tf.rank(xp) != 1:
           raise ValueError("xp and fp must be one-dimensional arrays of equal size")
       
-      print('x', x)
-      print('xp',xp)
+      x = tf.cast(x, tf.float32)
       i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
-      print('i', i)
-      print('fp', fp)
       df = tf.gather(fp,i) - tf.gather(fp, i - 1)
       dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
       delta = x - tf.gather(xp, i - 1)
