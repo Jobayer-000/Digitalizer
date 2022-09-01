@@ -82,7 +82,7 @@ def get_interp_fn(_xp, _fp):
   def _fn(x):
       if tf.shape(_xp) != tf.shape(_fp) or tf.rank(_xp) != 1:
           raise ValueError("xp and fp must be one-dimensional arrays of equal size")
-      x, xp, fp = _promote_dtypes_inexact(x, _xp, _fp)
+      
 
       i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
       df = fp[i] - fp[i - 1]
