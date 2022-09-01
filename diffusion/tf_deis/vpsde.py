@@ -88,10 +88,10 @@ def get_interp_fn(xp, fp):
       print('fp', fp)
       i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
       print('i', i)
-      df = fp[i] - fp[i - 1]
-      dx = xp[i] - xp[i - 1]
-      delta = x - xp[i - 1]
-      f = tf.where((dx == 0), fp[i], fp[i - 1] + (delta / dx) * df)
+      df = tf.gather(fp,i) - tf.gather(fp, i - 1)
+      dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
+      delta = x - tf.gather(xp, i - 1)
+      f = tf.where((dx == 0), tf.gather(fp, i), tf.gather(fp, i - 1) + (delta / dx) * df)
       return f
   return _fn
 
