@@ -102,12 +102,10 @@ def get_interp_fn(xp_, fp):
         xp = xp_
         i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=tf.size(xp) - 1)
       df = tf.gather(fp,i) - tf.gather(fp, i - 1)
-      print('xp', xp)
-      print('i', i)
       dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
       delta = x - tf.gather(xp, i - 1)
       f = tf.where((dx == 0), tf.gather(fp, i), tf.gather(fp, i - 1) + (delta / dx) * df)
-      return dx
+      return df
   return _fn
 
 class DiscreteVPSDE(VPSDE):
