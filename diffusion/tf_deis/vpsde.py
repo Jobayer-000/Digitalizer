@@ -57,7 +57,7 @@ class VPSDE(ExpSDE, MultiStepSDE):
         if len(t_start.shape)>len(t_end.shape):
             t_end = t_end[...,None]
        
-        return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
+        return tf.sqrt(self.t2alpha_fn(t_end)[0] / self.t2alpha_fn(t_start)[0])
 
     def eps_integrand(self, vec_t):
        
@@ -105,7 +105,7 @@ def get_interp_fn(xp_, fp):
       dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
       delta = x - tf.gather(xp, i - 1)
       f = tf.where((dx == 0), tf.gather(fp, i), tf.gather(fp, i - 1) + (delta / dx) * df)
-      return i
+      return f, df, dx, delta, i, tf.gather(fp, i - 1) + (delta / dx) * df
   return _fn
 
 class DiscreteVPSDE(VPSDE):
