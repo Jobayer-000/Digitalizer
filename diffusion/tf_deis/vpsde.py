@@ -61,7 +61,7 @@ class VPSDE(ExpSDE, MultiStepSDE):
 
     def eps_integrand(self, vec_t):
         print('vec_t', vec_t)
-        print('t_alpha_fn', self.t2alpha_fn(vec_t))
+       
         d_log_alpha_dtau = tf.math.log(self.t2alpha_fn(vec_t))
         
         print('d_log_alpha_dtau', d_log_alpha_dtau)
@@ -110,7 +110,7 @@ def get_interp_fn(xp_, fp):
       print('delta', delta)
       f = tf.where((dx == 0), tf.gather(fp, i), tf.gather(fp, i - 1) + (delta / dx) * df)
       print('fd', tf.gather(fp, i - 1) + (delta / dx) * df)
-      print('x')
+      print('x', x)
       print('_xp', xp_)
       return f 
   return _fn
