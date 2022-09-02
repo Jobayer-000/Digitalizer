@@ -97,11 +97,11 @@ def get_interp_fn(xp_, fp):
       
       if len(x.shape)>len(xp_.shape):
             xp = tf.tile(xp_[None,...], [x.shape[0], 1])
-            i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
+            i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=tf.size(xp) - 1)
             xp = xp[0]
       else:
         xp = xp_
-        i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
+        i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=tf.size(xp) - 1)
       print('i', i)
       df = tf.gather(fp,i) - tf.gather(fp, i - 1)
       print('df', df)
