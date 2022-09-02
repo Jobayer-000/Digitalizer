@@ -7,7 +7,6 @@ def get_integrator_basis_fn(sde):
         dt = tf.cast((t_end - t_start) / num_item,tf.float32)
       
         t_inter = tf.cast(tf.transpose(tf.linspace(t_start, t_end, num_item), [1,0]), tf.float32)
-        print('t_end', t_end)
         psi_coef = sde.psi(t_inter, t_end)
         integrand = sde.eps_integrand(t_inter)
 
@@ -50,6 +49,7 @@ def get_one_coef_per_step_fn(sde):
         """
         integrand, t_inter, dt = _eps_coef_worker_fn(t_start, t_end, num_item)
         poly_coef = single_poly_coef(t_inter, ts_poly, coef_idx)
+        print('single_poly', poly_coef)
         return tf.reduce_sum(integrand[:,None,:] * poly_coef, -1) * dt[...,None]
     return _worker
 
@@ -64,7 +64,9 @@ def get_coef_per_step_fn(sde, highest_order, order):
         ts_poly = ts_poly[:,:order+1]
         
         coef = eps_coef_fn(t_start, t_end, ts_poly, tf.range(order+1)[::-1], num_item)
+        print('coef_fn', coef)
         rtn = tf.concat([coef, tf.tile(rtn[order+1:][None,...], [coef.shape[0],1])], axis=-1)
+        print('rtn', rtn)
         return rtn
     return _worker
 
@@ -89,7 +91,7 @@ def get_ab_eps_coef(sde, highest_order, timesteps, order):
     vec_ts_poly = tf.gather(timesteps, idx)
     print('vec_ts_poly', vec_ts_poly)
     cur_coef = cur_coef_worker(timesteps[order:-1], timesteps[order+1:], vec_ts_poly) #[3, 4, (0,1,2,3)]
-    print('cur_coef')
+    print('cur_coef',cur_coef)
     return tf.concat(
         [
             prev_coef,
