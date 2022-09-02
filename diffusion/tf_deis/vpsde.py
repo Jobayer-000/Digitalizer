@@ -56,12 +56,14 @@ class VPSDE(ExpSDE, MultiStepSDE):
     def psi(self, t_start, t_end):
         if len(t_start.shape)>len(t_end.shape):
             t_end = t_end[...,None]
-        print('psi', tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start)))
+       
         return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
 
     def eps_integrand(self, vec_t):
-        d_log_alpha_dtau = tf.math.log(self.t2alpha_fn(vec_t))
         print('vec_t', vec_t)
+        print('t_alpha_fn', self.t2alpha_fn(vec_t))
+        d_log_alpha_dtau = tf.math.log(self.t2alpha_fn(vec_t))
+        
         print('d_log_alpha_dtau', d_log_alpha_dtau)
         
         integrand = -0.5 * d_log_alpha_dtau / tf.sqrt(1 - self.t2alpha_fn(vec_t))
@@ -91,7 +93,6 @@ def get_interp_fn(xp_, fp):
           raise ValueError("xp and fp must be one-dimensional arrays of equal size")
       
       x = tf.cast(x, tf.float32)
-      print('x', x)
       if len(x.shape)>len(xp_.shape):
             xp = tf.tile(xp_[None,...], [x.shape[0], 1])
             i = tf.clip_by_value(tf.searchsorted(xp, x, side='right'), clip_value_min=1, clip_value_max=len(xp) - 1)
@@ -103,7 +104,6 @@ def get_interp_fn(xp_, fp):
       dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
       delta = x - tf.gather(xp, i - 1)
       f = tf.where((dx == 0), tf.gather(fp, i), tf.gather(fp, i - 1) + (delta / dx) * df)
-      print('f', f)
       return f
   return _fn
 
