@@ -114,14 +114,16 @@ class DiscreteVPSDE(VPSDE):
         j_times = tf.range(len(discrete_alpha), dtype=tf.float32)
 
         # use a piecewise linear function to fit alpha
-        _t2alpha_fn = get_interp_fn(j_times, j_alphas)
-        _alpha2t_fn = get_interp_fn(2.0 - j_alphas, j_times)
-        t2alpha_fn = lambda item: tf.clip_by_value(
-            _t2alpha_fn(item), clip_value_min=1e-7, clip_value_max=1.0 - 1e-7
-        )
-        alpha2t_fn = lambda item: tf.clip_by_value(
-            _alpha2t_fn(2.0 - item), clip_value_min=j_times[0], clip_value_max=j_times[-1]
-        )
+        #_t2alpha_fn = get_interp_fn(j_times, j_alphas)
+        #_alpha2t_fn = get_interp_fn(2.0 - j_alphas, j_times)
+        #t2alpha_fn = lambda item: tf.clip_by_value(
+            #_t2alpha_fn(item), clip_value_min=1e-7, clip_value_max=1.0 - 1e-7
+        #)
+        #alpha2t_fn = lambda item: tf.clip_by_value(
+            #_alpha2t_fn(2.0 - item), clip_value_min=j_times[0], clip_value_max=j_times[-1]
+        #)
+        t2alpha_fn = lambda item:_t2alpha_fn(item)
+        alpha2t_fn = lambda item: _alpha2t_fn(2.0 - item)
         super().__init__(t2alpha_fn, alpha2t_fn, j_times[0], j_times[-1])
         warnings.warn(
             "\nWe are using a piecewise linear function to fit alpha and construct continuous time SDE\n" + \
