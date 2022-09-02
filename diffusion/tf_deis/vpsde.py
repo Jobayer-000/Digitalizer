@@ -62,7 +62,7 @@ class VPSDE(ExpSDE, MultiStepSDE):
     def eps_integrand(self, vec_t):
         with tf.GradientTape() as tape:
             tape.watch(vec_t)
-            y = self.t2alpha_fn(vec_t)
+            y = tf.math.log(self.t2alpha_fn(vec_t))
         d_log_alpha_dtau = tape.gradient(y, vec_t)
         print('d_log_alpha_dtau', d_log_alpha_dtau)
         integrand = -0.5 * d_log_alpha_dtau / tf.sqrt(1 - self.t2alpha_fn(vec_t))
