@@ -105,7 +105,7 @@ def get_interp_fn(xp_, fp):
       dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
       delta = x - tf.gather(xp, i - 1)
       f = tf.where((dx == 0), tf.gather(fp, i), tf.gather(fp, i - 1) + (delta / dx) * df)
-      return f 
+      return dx
   return _fn
 
 class DiscreteVPSDE(VPSDE):
