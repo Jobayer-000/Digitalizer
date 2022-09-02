@@ -57,17 +57,14 @@ class VPSDE(ExpSDE, MultiStepSDE):
         if len(t_start.shape)>len(t_end.shape):
             t_end = t_end[...,None]
        
-        return tf.sqrt(self.t2alpha_fn(t_end)[0] / self.t2alpha_fn(t_start)[0])
+        return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
 
     def eps_integrand(self, vec_t):
-       
-        d_log_alpha_dtau, df, dx, delta, i, fd  = self.t2alpha_fn(vec_t)
-        print('df', df)
-        print('dx', dx)
-        print('i', i)
-        print('fd', fd)
+        with tf.GradientTape() as tape:
+            tape.watch(vec_t)
+            y = self.t2alpha_fn(vec_t)
+        d_log_alpha_dtau = tape.gradients(y, vec_t)
         print('d_log_alpha_dtau', d_log_alpha_dtau)
-        
         integrand = -0.5 * d_log_alpha_dtau / tf.sqrt(1 - self.t2alpha_fn(vec_t))
         print('eps_integ', integrand)
         return integrand
@@ -108,7 +105,7 @@ def get_interp_fn(xp_, fp):
       dx = tf.gather(xp, i) - tf.gather(xp, i - 1)
       delta = x - tf.gather(xp, i - 1)
       f = tf.where((dx == 0), tf.gather(fp, i), tf.gather(fp, i - 1) + (delta / dx) * df)
-      return f, df, dx, delta, i, tf.gather(fp, i - 1) + (delta / dx) * df
+      return f
   return _fn
 
 class DiscreteVPSDE(VPSDE):
