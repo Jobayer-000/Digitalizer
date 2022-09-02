@@ -114,8 +114,8 @@ class DiscreteVPSDE(VPSDE):
         j_times = tf.range(len(discrete_alpha), dtype=tf.float32)
 
         # use a piecewise linear function to fit alpha
-        #_t2alpha_fn = get_interp_fn(j_times, j_alphas)
-        #_alpha2t_fn = get_interp_fn(2.0 - j_alphas, j_times)
+        _t2alpha_fn = get_interp_fn(j_times, j_alphas)
+        _alpha2t_fn = get_interp_fn(2.0 - j_alphas, j_times)
         #t2alpha_fn = lambda item: tf.clip_by_value(
             #_t2alpha_fn(item), clip_value_min=1e-7, clip_value_max=1.0 - 1e-7
         #)
