@@ -56,11 +56,13 @@ class VPSDE(ExpSDE, MultiStepSDE):
     def psi(self, t_start, t_end):
         if len(t_start.shape)>len(t_end.shape):
             t_end = t_end[...,None]
+        print('psi', tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start)))
         return tf.sqrt(self.t2alpha_fn(t_end) / self.t2alpha_fn(t_start))
 
     def eps_integrand(self, vec_t):
         d_log_alpha_dtau = tf.map_fn(self.log_alpha_fn, vec_t)
         integrand = -0.5 * d_log_alpha_dtau / tf.sqrt(1 - self.t2alpha_fn(vec_t))
+        print('eps_integ', integrand)
         return integrand
 
     def t2rho(self, t):
