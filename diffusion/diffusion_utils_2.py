@@ -281,7 +281,7 @@ class GaussianDiffusion2:
     output = tf.where(tf.equal(t, 0), decoder_nll, kl)
     return (output, pred_xstart) if return_pred_xstart else output
 
-  def training_losses(self, denoise_fn, x_start, lr_inp, t, noise=None):
+  def training_losses(self, x_start, lr_inp, t, noise=None):
     """
     Training loss calculation
     """
@@ -295,8 +295,9 @@ class GaussianDiffusion2:
 
     # Calculate the loss
     if self.loss_type == 'kl':  # the variational bound
-      losses = self._vb_terms_bpd(
-        denoise_fn=denoise_fn, x_start=x_start, x_t=x_t, up_lr=up_lr, t=t, clip_denoised=False, return_pred_xstart=False)
+      pass
+      #losses = self._vb_terms_bpd(
+        #denoise_fn=denoise_fn, x_start=x_start, x_t=x_t, up_lr=up_lr, t=t, clip_denoised=False, return_pred_xstart=False)
     elif self.loss_type == 'mse':  # unweighted MSE
       assert self.model_var_type != 'learned'
       target = {
@@ -304,14 +305,14 @@ class GaussianDiffusion2:
         'xstart': x_start,
         'eps': noise
       }[self.model_mean_type]
-      model_output = denoise_fn(tf.concat([x_t, up_lr],axis=-1))
-      assert model_output.shape == target.shape == x_start.shape
-      losses = nn.meanflat(tf.square(tf.subtract(target, model_output)))
+      #model_output = denoise_fn(tf.concat([x_t, up_lr],axis=-1))
+      #assert model_output.shape == target.shape == x_start.shape
+      #losses = nn.meanflat(tf.square(tf.subtract(target, model_output)))
     else:
       raise NotImplementedError(self.loss_type)
 
-    assert losses.shape == t.shape
-    return losses
+    #assert losses.shape == t.shape
+    return tf.concat([x_t, up_lr],axis=-1) ,target
 
   def _prior_bpd(self, x_start):
     B, T = x_start.shape[0], self.num_timesteps
