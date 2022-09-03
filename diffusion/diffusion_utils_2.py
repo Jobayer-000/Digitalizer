@@ -281,7 +281,7 @@ class GaussianDiffusion2:
     output = tf.where(tf.equal(t, 0), decoder_nll, kl)
     return (output, pred_xstart) if return_pred_xstart else output
 
-  def training_losses(self, x_start, lr_inp, t, shape, noise=None):
+  def training_losses(self, x_start, lr_inp, t, noise=None):
     """
     Training loss calculation
     """
