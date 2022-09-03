@@ -281,11 +281,11 @@ class GaussianDiffusion2:
     output = tf.where(tf.equal(t, 0), decoder_nll, kl)
     return (output, pred_xstart) if return_pred_xstart else output
 
-  def training_losses(self, x_start, lr_inp, t, noise=None):
+  def training_losses(self, x_start, lr_inp, t, shape, noise=None):
     """
     Training loss calculation
     """
-    up_lr = tf.expand_dims(tf.image.resize(lr_inp[0], x_start.shape[2:-1], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
+    up_lr = tf.expand_dims(tf.image.resize(lr_inp[0], shape, method=tf.image.ResizeMethod.NEAREST_NEIGHBOR),0)
     # Add noise to data
     assert t.shape == [x_start.shape[0]]
     if noise is None:
